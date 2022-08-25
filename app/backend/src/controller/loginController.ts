@@ -16,6 +16,10 @@ const loginController = {
   },
 
   async login(req: Request, res:Response) {
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/g;
+    if (!emailRegex.test(req.body.email)) {
+      return res.status(400).json({ message: 'All fields must be filled' });
+    }
     const checkUser = await loginService.getUser(req.body.email);
     if (!checkUser) {
       return res.status(401).json({ message: 'Incorrect email or password' });
