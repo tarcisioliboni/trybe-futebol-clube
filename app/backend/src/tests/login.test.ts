@@ -7,6 +7,7 @@ import { app } from '../app';
 import Example from '../database/models/ExampleModel';
 
 import { Response } from 'superagent';
+import loginController from '../controller/loginController'
 
 chai.use(chaiHttp);
 
@@ -22,7 +23,9 @@ const invalidUserMock = {
   password: 'senhasecreta'
 }
 
-describe('login test', () => {
+const tokenMock = '6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ'
+
+describe('/login test', () => {
   beforeEach(() => {
   })
   afterEach(() => {
@@ -36,10 +39,41 @@ describe('login test', () => {
     expect(res.status).to.equal(200)
   })
 
-  it('Status 401', async () => {
+  it('Status 401: Incorrect email or password', async () => {
     const res = await chai.request(app)
      .post('/login')
      .send(invalidUserMock)
     expect(res.status).to.equal(401)
+  })
+  // it('Status 400: All fields must be filled', async () => {
+  //   const res = await chai.request(app)
+  //     .post('./login')
+  //     .send({
+  //       email: '',
+  //       password: 'secretadmin'
+  //     })
+  //   expect(res.status).to.equal(400)
+  //   expect(res.body.message).to.equal("All fields must be filled")
+  // })
+  it('Return Token', async () => {
+    sinon.stub(loginController, "createToken").resolves(tokenMock)
+    const res = await chai.request(app)
+      .post('/login')
+      .send(userMock)
+    expect(res.body.token).to.equal(tokenMock)
+  })
+});
+
+describe('/login test', () => {
+  beforeEach(() => {
+  })
+  afterEach(() => {
+    sinon.restore();
+  })
+  it('Status 200', async () => {
+    const res = await chai.request(app)
+      .get('/login/validate')
+      .set({'Authorization': tokenMock })
+    expect(res.status).to.equal(200)
   })
 });
