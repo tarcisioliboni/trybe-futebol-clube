@@ -1,18 +1,28 @@
 import { Request, Response } from 'express';
-import { sign, SignOptions } from 'jsonwebtoken';
-import { inLogin } from '../interfaces';
+import { sign, SignOptions, verify } from 'jsonwebtoken';
+import TokenErr from '../error';
+import { inLogin, inToken } from '../interfaces';
 import loginService from '../services/loginService';
 
 const secret = process.env.JWT_SECRET || 'secret';
 
 const loginController = {
-  createToken(data: inLogin) {
+  async createToken(data: inLogin) {
     const config: SignOptions = {
       expiresIn: '10d',
       algorithm: 'HS256',
     };
     const token = sign({ data }, secret, config);
     return token;
+  },
+
+  async validateToken(token: string) {
+    try {
+      const backInfo = verify(token, secret);
+      return backInfo as inToken;
+    } catch (err) {
+      throw new TokenErr('Token is not valid');
+    }
   },
 
   async login(req: Request, res:Response) {
@@ -27,6 +37,19 @@ const loginController = {
     }
     const token = await loginController.createToken(req.body);
     return res.status(200).json({ token });
+  },
+
+  async validate(req: Request, res:Response) {
+    const token = req.headers.authorization;
+    if (!token) {
+      return res.status(401).json({ message: 'Token not found' });
+    }
+    const { data: { email } } = await loginController.validateToken(token);
+    const user = await loginService.getUser(email);
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+    return res.status(200).json({ role: user.role });
   },
 };
 
