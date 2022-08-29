@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { sign, SignOptions, verify } from 'jsonwebtoken';
-import TokenErr from '../error';
+import ErrMid from '../error';
 import { inLogin, inToken } from '../interfaces';
 import loginService from '../services/loginService';
 
@@ -21,7 +21,7 @@ const loginController = {
       const backInfo = verify(token, secret);
       return backInfo as inToken;
     } catch (err) {
-      throw new TokenErr('Token is not valid');
+      throw new ErrMid('Token is not valid', 400);
     }
   },
 
