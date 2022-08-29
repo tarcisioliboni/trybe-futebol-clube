@@ -45,16 +45,6 @@ describe('/login test', () => {
      .send(invalidUserMock)
     expect(res.status).to.equal(401)
   })
-  // it('Status 400: All fields must be filled', async () => {
-  //   const res = await chai.request(app)
-  //     .post('./login')
-  //     .send({
-  //       email: '',
-  //       password: 'secretadmin'
-  //     })
-  //   expect(res.status).to.equal(400)
-  //   expect(res.body.message).to.equal("All fields must be filled")
-  // })
   it('Return Token', async () => {
     sinon.stub(loginController, "createToken").resolves(tokenMock)
     const res = await chai.request(app)
