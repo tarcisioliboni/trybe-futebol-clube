@@ -60,6 +60,7 @@ describe('/login test', () => {
   afterEach(() => {
     sinon.restore();
   })
+
   it('Status 200', async () => {
     const res = await chai.request(app)
       .get('/login/validate')
