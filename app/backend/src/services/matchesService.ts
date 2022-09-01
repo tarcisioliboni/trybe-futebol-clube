@@ -1,3 +1,4 @@
+import { inMatch } from '../interfaces';
 import matchesModel from '../database/models/matchesModel';
 import teamsModel from '../database/models/teamsModel';
 
@@ -18,6 +19,18 @@ const matchesService = {
       ],
     });
     return allMaches;
+  },
+
+  async addMatch(match: inMatch) {
+    const { homeTeam, awayTeam, homeTeamGoals, awayTeamGoals } = match;
+    const resAdd = await matchesModel.create({
+      homeTeam,
+      awayTeam,
+      homeTeamGoals,
+      awayTeamGoals,
+      inProgress: true,
+    }, { raw: true });
+    return resAdd;
   },
 };
 

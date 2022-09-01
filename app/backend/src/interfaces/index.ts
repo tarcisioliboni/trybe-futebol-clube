@@ -9,3 +9,11 @@ export interface inToken {
     password: string,
   }
 }
+
+export interface inMatch {
+  homeTeam: number,
+  homeTeamGoals: number,
+  awayTeam: number,
+  awayTeamGoals: number,
+  inProgress: boolean,
+}
