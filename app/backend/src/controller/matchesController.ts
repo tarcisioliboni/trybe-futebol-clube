@@ -8,8 +8,15 @@ const matchesController = {
   },
 
   async addMatch(req: Request, res: Response) {
-    const newMatch = await matchesService.addMatch(req.body);
-    return res.status(201).json(newMatch);
+    await matchesService.validateMatches(req.body);
+    const matchRes = await matchesService.addMatch(req.body);
+    return res.status(201).json(matchRes);
+  },
+
+  async finishMatch(req: Request, res: Response) {
+    const { id } = req.params;
+    await matchesService.finishMatch(Number(id));
+    return res.status(200).json({ message: 'Finished' });
   },
 };
 
