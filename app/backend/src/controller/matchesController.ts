@@ -18,6 +18,13 @@ const matchesController = {
     await matchesService.finishMatch(Number(id));
     return res.status(200).json({ message: 'Finished' });
   },
+
+  async updateMatch(req: Request, res: Response) {
+    const { id } = req.params;
+    const { homeTeamGoals, awayTeamGoals } = req.body;
+    const matchRes = await matchesService.upMatch(Number(id), homeTeamGoals, awayTeamGoals);
+    res.status(200).json(matchRes);
+  },
 };
 
 export default matchesController;

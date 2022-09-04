@@ -52,6 +52,14 @@ const matchesService = {
     }, { where: { id } });
     return finishRes;
   },
+
+  async upMatch(id: number, homeTeamGoals: number, awayTeamGoals: number) {
+    await matchesModel.update({
+      awayTeamGoals,
+      homeTeamGoals,
+    }, { where: { id } });
+  },
+
 };
 
 export default matchesService;
