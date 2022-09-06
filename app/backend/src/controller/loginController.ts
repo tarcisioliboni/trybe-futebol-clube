@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { sign, SignOptions, verify } from 'jsonwebtoken';
-import ErrMid from '../error';
 import { inLogin, inToken } from '../interfaces';
+import ErrorExt from '../error/ErrorExt';
 import loginService from '../services/loginService';
 
 const secret = process.env.JWT_SECRET || 'secret';
@@ -21,7 +21,7 @@ const loginController = {
       const backInfo = verify(token, secret);
       return backInfo as inToken;
     } catch (err) {
-      throw new ErrMid('Token is not valid', 400);
+      throw new ErrorExt('Token is not valid', 401);
     }
   },
 

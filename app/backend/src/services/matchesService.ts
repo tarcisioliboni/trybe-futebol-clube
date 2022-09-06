@@ -1,23 +1,24 @@
 import { inMatch } from '../interfaces';
 import matchesModel from '../database/models/matchesModel';
 import teamsModel from '../database/models/teamsModel';
-import ErrMid from '../error';
+import ErrorExt from '../error/ErrorExt';
+import teamsService from './teamsService';
 
 const matchesService = {
   async validateMatches(match: inMatch) {
     const { homeTeam, awayTeam } = match;
     if (homeTeam === awayTeam) {
-      throw new ErrMid('It is not possible to create a match with two equal teams', 401);
+      throw new ErrorExt('It is not possible to create a match with two equal teams', 401);
     }
-    const homeTeamCheck = await teamsModel.findOne({ where: { id: homeTeam } });
-    const awayTeamCheck = await teamsModel.findOne({ where: { id: awayTeam } });
+    const homeTeamCheck = await teamsService.getById(homeTeam);
+    const awayTeamCheck = await teamsService.getById(awayTeam);
     if (!homeTeamCheck || !awayTeamCheck) {
-      throw new ErrMid('There is no team with such id!', 404);
+      throw new ErrorExt('There is no team with such id!', 404);
     }
   },
 
   async getAll() {
-    const allMaches = await matchesModel.findAll({
+    const resGetAll = await matchesModel.findAll({
       include: [
         {
           model: teamsModel,
@@ -31,7 +32,7 @@ const matchesService = {
         },
       ],
     });
-    return allMaches;
+    return resGetAll;
   },
 
   async addMatch(match: inMatch) {
@@ -47,17 +48,18 @@ const matchesService = {
   },
 
   async finishMatch(id: number) {
-    const finishRes = await matchesModel.update({
+    const resFinish = await matchesModel.update({
       inProgress: false,
     }, { where: { id } });
-    return finishRes;
+    return resFinish;
   },
 
   async upMatch(id: number, homeTeamGoals: number, awayTeamGoals: number) {
-    await matchesModel.update({
+    const resMatch = await matchesModel.update({
       awayTeamGoals,
       homeTeamGoals,
     }, { where: { id } });
+    return resMatch;
   },
 
 };

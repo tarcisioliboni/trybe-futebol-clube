@@ -1,9 +1,10 @@
-import { Request, Response } from 'express';
-import ErrMid from '../error';
+import { ErrorRequestHandler } from 'express';
 
-const errorTest = (err: ErrMid, _req: Request, res: Response) => {
-  const { message, code } = err;
-  res.status(code).json({ message });
+const mwError: ErrorRequestHandler = (err, req, res, _next) => {
+  if (err.statusCode) {
+    return res.status(err.statusCode).json({ message: err.message });
+  }
+  return res.status(500).json({ message: err.message });
 };
 
-export default errorTest;
+export default mwError;

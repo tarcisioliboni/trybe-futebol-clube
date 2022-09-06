@@ -15,5 +15,5 @@ export interface inMatch {
   homeTeamGoals: number,
   awayTeam: number,
   awayTeamGoals: number,
-  inProgress: boolean,
+  inProgress?: boolean,
 }
