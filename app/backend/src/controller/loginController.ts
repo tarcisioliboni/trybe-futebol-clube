@@ -21,7 +21,7 @@ const loginController = {
       const backInfo = verify(token, secret);
       return backInfo as inToken;
     } catch (err) {
-      throw new ErrorExt('Token is not valid', 401);
+      throw new ErrorExt('Token must be a valid token', 401);
     }
   },
 

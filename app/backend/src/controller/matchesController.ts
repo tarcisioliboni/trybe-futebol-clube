@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import ErrorExt from '../error/ErrorExt';
 import matchesService from '../services/matchesService';
+import loginController from './loginController';
 
 const matchesController = {
   async allTeams(req: Request, res:Response) {
@@ -8,6 +10,9 @@ const matchesController = {
   },
 
   async addMatch(req: Request, res: Response) {
+    const token = req.headers.authorization;
+    if (!token) throw new ErrorExt('Token not found', 401);
+    await loginController.validateToken(token);
     await matchesService.validateMatches(req.body);
     const resAddMatch = await matchesService.addMatch(req.body);
     return res.status(201).json(resAddMatch);
