@@ -24,6 +24,12 @@ export const awayGoalsStatus = (matches: inMatch[]): inGoalsMatch[] => matches.m
   };
 });
 
+export const allGoalsStatus = (matches: inMatch[], id: number): inGoalsMatch[] => {
+  const checkHomeGoalsStatus = homeGoalsStatus(matches.filter((match) => match.homeTeam === id));
+  const checkAwayGoalsStatus = awayGoalsStatus(matches.filter((match) => match.awayTeam === id));
+  return [...checkHomeGoalsStatus, ...checkAwayGoalsStatus];
+};
+
 export const totalVDL = (matches: inGoalsMatch[]) => {
   let totalVictories = 0; let totalDraws = 0; let totalLosses = 0;
   matches.forEach((match) => {
@@ -72,6 +78,35 @@ export const leaderboardAway = (matches: inGoalsMatch[]) => {
     goalsFavor,
     goalsOwn,
     goalsBalance };
+};
+
+export const allGoals = (matches: inGoalsMatch[]) => {
+  let goalsFavor = 0; let goalsOwn = 0;
+  matches.forEach((mat) => {
+    const goals = [mat.awayTeamGoals, mat.homeTeamGoals];
+    const biggerValueGoal = (Math.max(...goals)); const smallerValueGoal = (Math.min(...goals));
+    if (mat.status === 'draw') { goalsFavor += mat.homeTeamGoals; goalsOwn += mat.homeTeamGoals; }
+    if (mat.status === 'winner') { goalsFavor += biggerValueGoal; goalsOwn += smallerValueGoal; }
+    if (mat.status === 'loser') { goalsFavor += smallerValueGoal; goalsOwn += biggerValueGoal; }
+  });
+  const goalsBalance = goalsFavor - goalsOwn;
+  return { goalsFavor, goalsOwn, goalsBalance };
+};
+
+export const leaderboardAll = (matches: inGoalsMatch[]) => {
+  const { totalVictories, totalDraws, totalLosses } = totalVDL(matches);
+  const totalPoints = totalVictories * 3 + totalDraws;
+  const totalGames = matches.length;
+  const efficiency = ((totalPoints / (totalGames * 3)) * 100).toFixed(2);
+  const insertAllGoals = allGoals(matches);
+  return {
+    totalVictories,
+    totalDraws,
+    totalPoints,
+    totalLosses,
+    totalGames,
+    efficiency,
+    ...insertAllGoals };
 };
 
 export const leaderboardSort = (result: inTeamData[]) => result.sort((a, b) => {

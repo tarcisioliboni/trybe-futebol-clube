@@ -1,7 +1,8 @@
+import { Op } from 'sequelize';
 import matchesModel from '../database/models/matchesModel';
 import teamsModel from '../database/models/teamsModel';
-import { homeGoalsStatus, leaderboardHome,
-  leaderboardSort, awayGoalsStatus, leaderboardAway } from '../helpers/leaderbordBusinessRules';
+import { homeGoalsStatus, leaderboardHome, leaderboardSort, awayGoalsStatus,
+  leaderboardAway, allGoalsStatus, leaderboardAll } from '../helpers/leaderbordBusinessRules';
 
 const leaderboardService = {
   async getAllHomeLeaderboard() {
@@ -32,6 +33,23 @@ const leaderboardService = {
     }));
     return leaderboardSort(allAwayTeams);
   },
+
+  async getAllLeaderboard() {
+    const teams = await teamsModel.findAll();
+    const allTeams = await Promise.all(teams.map(async (team) => {
+      const allTeamMatches = await matchesModel.findAll(
+        { where: { [Op.or]: [{ awayTeam: team.id }, { homeTeam: team.id }], inProgress: 0 } },
+      );
+      const matchesStatus = allGoalsStatus(allTeamMatches, team.id);
+      const allTeamLeaderboard = leaderboardAll(matchesStatus);
+      return {
+        name: team.teamName,
+        ...allTeamLeaderboard,
+      };
+    }));
+    return leaderboardSort(allTeams);
+  },
+
 };
 
 export default leaderboardService;
