@@ -6,6 +6,10 @@ const leaderboardController = {
     const resLeaderboardHome = await leaderboardService.getAllHomeLeaderboard();
     res.status(200).json(resLeaderboardHome);
   },
+  async leaderboardAway(_req: Request, res: Response) {
+    const resLeaderboardAway = await leaderboardService.getAllAwayLeaderboard();
+    res.status(200).json(resLeaderboardAway);
+  },
 };
 
 export default leaderboardController;
